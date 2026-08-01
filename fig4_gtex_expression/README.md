@@ -1,8 +1,7 @@
 # Figure 4 + S4 — GTEx variant 5S rRNA expression and trans-effects
 
-GTEx is controlled (dbGaP phs000424). The DE pipeline is `GTEx/de_v2/`; earlier iterations
-(`figures/de_expression`, `scripts/eq*`, `ex01–04`, `vm_archive`) are superseded. The DE run
-executed on a compute server (`de_v2/`, with `meta/SUMMARY.tsv`).
+GTEx is controlled (dbGaP phs000424). The differential-expression pipeline is `GTEx/de_v2/`,
+run on a compute server (`meta/SUMMARY.tsv`).
 
 | Panel | Script |
 |---|---|

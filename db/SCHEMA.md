@@ -53,14 +53,6 @@ The GIAB benchmark individual HG002 (Ashkenazi Jewish male). This entry uses the
 - **Array database (PATERNAL = hap2):** `databases/5S_array_database_HG002_PATERNAL.tsv` — 69 copies
 - **SR read variants:** BGIseq 150 bp, aligned to T2T consensus (bcftools mpileup, ~2,750× depth)
 
-### 2.4 REH Cell Line (`cohort = "REH_CellLine"`)
-
-REH is a B-cell precursor leukemia cell line. No per-copy assembly database is available (no T2T-quality assembly). Only read-based variant calls are stored.
-
-- **HiFi read variants (LR):** PacBio CCS, 54 variant sites (VAF ≥ 2%, AD ≥ 3)
-- **Illumina read variants (SR):** ~34× WGS, 588 pileup entries from bcftools mpileup
-- **Estimated copy number:** ~76 (from SR depth ÷ 34× WGS coverage)
-
 ---
 
 ## 3. Processing Pipelines
@@ -159,7 +151,7 @@ One row per individual or cell line.
 | Column | Type | Description |
 |---|---|---|
 | `assembly_id` | INTEGER PK | Auto-increment |
-| `sample_id` | TEXT UNIQUE | Identifier (e.g. `"HG00438"`, `"CHM13"`, `"REH"`) |
+| `sample_id` | TEXT UNIQUE | Identifier (e.g. `"HG00438"`, `"CHM13"`) |
 | `cohort` | TEXT | Dataset of origin (see §5.1) |
 | `population` | TEXT | 1000 Genomes population code (e.g. `"CHS"`, `"YRI"`). NULL for non-HPRC samples |
 | `superpopulation` | TEXT | Five-letter superpopulation (e.g. `"EAS"`, `"AFR"`). NULL for non-HPRC |
@@ -176,7 +168,7 @@ One row per individual or cell line.
 
 ### 4.3 `haplotype`
 
-One row per (individual, haplotype) pair. For diploid assemblies there are two rows per individual; for haploid assemblies (CHM13) one row; REH has no rows (no assembly).
+One row per (individual, haplotype) pair. For diploid assemblies there are two rows per individual; for haploid assemblies (CHM13) one row.
 
 | Column | Type | Description |
 |---|---|---|
@@ -273,8 +265,8 @@ One row per variant detected from sequencing reads via bcftools mpileup. Not cop
 
 | Modality | Rows | Samples |
 |---|---|---|
-| `hifi` | 149 | HG01891, HG02257 (HPRC pilot); REH |
-| `illumina` | 1,589 | REH; HG002_GIAB (BGIseq 150 bp) |
+| `hifi` | 149 | HG01891, HG02257 |
+| `illumina` | 1,589 | HG002_GIAB (BGIseq 150 bp) |
 
 Additional HPRC HiFi and Illumina `read_variant` rows are added as the read-based pipelines complete.
 
@@ -289,7 +281,6 @@ Additional HPRC HiFi and Illumina `read_variant` rows are added as the read-base
 | `"HPRC_Year1"` | 47 HPRC Year 1 individuals (Liao et al. 2023) |
 | `"CHM13"` | CHM13 T2T reference (Nurk et al. 2022) |
 | `"HG002_GIAB"` | HG002 hg002v1 GIAB assembly (distinct from HPRC HG002) |
-| `"REH_CellLine"` | REH B-ALL cell line |
 
 ### 5.2 `variant.alignment_source`
 
@@ -422,10 +413,10 @@ WHERE c.border_note = 'interior'
 GROUP BY a.sample_id
 ORDER BY pct DESC;
 
--- REH HiFi variants in the 5S gene
+-- HiFi read variants in the 5S gene for one sample
 SELECT rv.consensus_pos, rv.ref, rv.alt, rv.alt_depth, rv.vaf
 FROM read_variant rv JOIN assembly a USING(assembly_id)
-WHERE a.sample_id = 'REH' AND rv.modality = 'hifi' AND rv.region = 'gene'
+WHERE a.sample_id = 'HG01891' AND rv.modality = 'hifi' AND rv.region = 'gene'
 ORDER BY rv.consensus_pos;
 
 -- Variants shared between CHM13 and any HPRC haplotype (exact position + alt)

@@ -16,5 +16,4 @@ Long-read methylation/accessibility. Streaming stages ran on a compute server; f
 | S3N edge-biased gene-body variation | `nascent_edge_analysis/edge_analysis.py`, `edge_expression.py` | [local] |
 | DB `copy_methylation` build | `37_/38_*`, `60_multicontig_methylation.py` | [local] (+ server stream) |
 
-Notes: use `03_methylation_full215` (scripts 40/59_alu/60), NOT the superseded `03_methylation`
-(scripts 16/19). Tools: modkit, minimap2, fibertools-rs.
+Notes: methylation profiles use scripts 40 / 59_alu / 60. Tools: modkit, minimap2, fibertools-rs.

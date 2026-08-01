@@ -107,14 +107,14 @@ SR-caller calibration backbone (not all panelled): `61–73` [local] (VAF sweep,
 | 4H | trans-effect volcano | `ex05j_p10_4x4_biogenesis.py` (DE from `ex05e_fullmodel_gsea.py`) |
 | 4I,J,K,L | dose-response + GSEA + meta | `ex05g_dnarna_vaf_panel.py`, `de_v2/{de_common,de_meta,de_gsea}.py` |
 | genotyping | GTEx WGS/RNA 5S VAF | `GTEx/scripts/{10–14,20,23}` |
-DE run + logs: `de_v2/` on [server] (`meta/SUMMARY.tsv`). Superseded: `figures/de_expression`, `eq*`, `ex0[1-4]`, `vm_archive`.
+DE run + logs: `de_v2/` on [server] (`meta/SUMMARY.tsv`).
 
 ### Figure 5 — saturation mutagenesis   ([local] dated folders + `de_v2`)
 | Panel | Analysis | ★ Script |
 |---|---|---|
 | 5C–G | fraction-seq → expr/incorporation scores | `20251006 5S rRNA Sequencing experiment 1/` (`5S/`+`GFP/` stages → `process_rep_mutation_ratios.py`) |
 | 5(region E/G) | region expr/incorp panels | `GTEx/de_v2/make_fig5_region.py` |
-| S5F | RNAfold ΔΔG | `RNA-fold/regenerate_sense_folding.py` (+`make_folding_figure.py`) — use `*_CORRECTED.*`, NOT `Folding energies.csv` |
+| S5F | RNAfold ΔΔG | `RNA-fold/regenerate_sense_folding.py` (+`make_folding_figure.py`) |
 | load | functional scores → DB | `T2T/scripts/load_functional_annotation.py` |
 | S5D | expression by ICR region | part of fraction-seq analysis |
 Structure schematics (5D/F, S5E): `VIsualizing 5S rRNA/` (ChimeraX 8BGU) — assembled manually, not code-reproducible.
@@ -154,14 +154,7 @@ Structure schematics (5D/F, S5E): `VIsualizing 5S rRNA/` (ChimeraX 8BGU) — ass
 
 ---
 
-## 5. Excluded (present in the working tree, NOT in the paper)
-Evo_5S (cross-species); Hi-C (`HiC/`, `hic_analysis`, `scripts/hic`); most `rDNA_dosage_control`;
-pilots (`20250603`, `20250915`, CHM13/HG002 pilot, GTEx `de_expression`/`eq*`/`vm_archive`,
-cancer v1 `figures/`+`results_*`, Trios/Trios_2.0, `Folding energies.csv`).
-
----
-
-## 6. Scope and boundaries
+## 5. Scope and boundaries
 - Controlled data (UKBB, GTEx phs000424, TCGA phs000178, CPTAC phs001287, CPC) is referenced by
   accession and is not included; obtain it through the listed access paths.
 - The upstream UK Biobank read-extraction step runs on the UK Biobank Research Analysis Platform

@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # -----------------------------------------------------------------------------
-# import_legacy_assemblies.py — import CHM13, HG002, and REH copies/variants/read-variants into the database.
+# import_legacy_assemblies.py — import CHM13 and HG002 copies/variants/read-variants into the database.
 # Author: Jonathan Bohlen
 # (c) 2026 Jonathan Bohlen. Code accompanying Sengl et al. (2026),
 # "Surveillance and selection of 5S ribosomal RNA genes in the human genome."
 # Released under the MIT License; see LICENSE at the repository root.
 # -----------------------------------------------------------------------------
 """
-Import CHM13, HG002, and REH data into 5S_rDNA.db.
+Import CHM13 and HG002 data into 5S_rDNA.db.
 
 These pre-date the HPRC pipeline and use a slightly different database format:
   - gene_variants: 0-based positions within the 119 bp 5S gene only
@@ -20,11 +20,8 @@ Assemblies added:
   CHM13      — haploid, one haplotype (databases/5S_array_database.tsv)
   HG002_GIAB — diploid GIAB assembly: MATERNAL=hap1, PATERNAL=hap2
                (distinct from "HG002" in DB which is the HPRC Year 1 assembly)
-  REH        — cancer cell line, no assembly database; read variants only
 
 Read variants added (read_variant table):
-  REH  hifi      — REH_LR_variants.tsv (bcftools pos already 1-based)
-  REH  illumina  — analysis/sr/illumina.tsv (raw mpileup, bcftools query format)
   HG002_GIAB illumina — shortread_pipeline/tsv/BGIseq_150bp_t2tcons.tsv (bcftools query)
 
 Note: CHM13_mRNAseq_150bp_t2tcons.tsv is in raw samtools pileup format (not bcftools
@@ -53,8 +50,6 @@ HG002_MAT = T2T / "databases/5S_array_database_HG002_MATERNAL.tsv"
 HG002_PAT = T2T / "databases/5S_array_database_HG002_PATERNAL.tsv"
 
 # Read-variant source files
-REH_LR_TSV  = T2T / "REH/data/analysis/REH_LR_variants.tsv"
-REH_SR_TSV  = T2T / "REH/data/analysis/sr/illumina.tsv"
 HG002_SR_TSV = T2T / "HG002/shortread_pipeline/tsv/BGIseq_150bp_t2tcons.tsv"
 CHM13_RNA_TSV = T2T / "CHM13/shortread_pipeline/tsv/CHM13_mRNAseq_150bp_t2tcons.tsv"
 
@@ -314,49 +309,6 @@ def main():
         n_rv = import_read_variants(con, hg002_asm, "illumina", rows)
         con.commit()
         print(f"  read_variant (illumina/BGIseq_t2tcons): {n_rv} rows")
-
-    # ── REH ───────────────────────────────────────────────────────────────────
-    print("\n── REH ──")
-    con.execute("""
-        INSERT OR IGNORE INTO assembly
-          (sample_id, cohort, has_hifi, has_illumina, has_rnaseq)
-        VALUES ('REH','REH_CellLine',1,1,1)
-    """)
-    con.commit()
-    reh_asm = con.execute(
-        "SELECT assembly_id FROM assembly WHERE sample_id='REH'"
-    ).fetchone()[0]
-
-    # REH HiFi (LR) variants from REH_LR_variants.tsv
-    # Columns: pos, ref, alt, pb_vaf, pb_ad, pb_dp, ... lr_vaf, lr_ad, lr_dp, region
-    if REH_LR_TSV.exists():
-        lr = pd.read_csv(REH_LR_TSV, sep="\t")
-        rows = []
-        for _, r in lr.iterrows():
-            pos = int(r["pos"])
-            rows.append((reh_asm, "hifi", pos,
-                         str(r["ref"]), str(r["alt"]),
-                         safe_int(r.get("pb_dp") or r.get("lr_dp")),
-                         safe_int(r.get("pb_ad") or r.get("lr_ad")),
-                         safe_float(r.get("pb_vaf") or r.get("lr_vaf")),
-                         safe_str(r.get("region"))))
-        n_rv = import_read_variants(con, reh_asm, "hifi", rows)
-        con.commit()
-        print(f"  read_variant (hifi): {n_rv} rows")
-
-    # REH illumina read variants (raw mpileup)
-    if REH_SR_TSV.exists():
-        sr_df = load_mpileup_tsv(REH_SR_TSV)
-        rows = []
-        for _, r in sr_df.iterrows():
-            pos = int(r["pos"])
-            rows.append((reh_asm, "illumina", pos,
-                         str(r["ref"]), str(r["alt"]),
-                         safe_int(r["dp"]), safe_int(r["ad"]), safe_float(r["vaf"]),
-                         region_of(pos)))
-        n_rv = import_read_variants(con, reh_asm, "illumina", rows)
-        con.commit()
-        print(f"  read_variant (illumina): {n_rv} rows")
 
     # ── final summary ─────────────────────────────────────────────────────────
     print("\n── Database summary ─────────────────────────────────────────────")

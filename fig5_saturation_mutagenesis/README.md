@@ -1,7 +1,7 @@
 # Figure 5 + S5 — saturation mutagenesis of the 5S rRNA gene
 
 Functional assay generated here (raw reads: GEO GSE339543). Definitive experiment folder:
-`20251006 5S rRNA Sequencing experiment 1/` (earlier `20250603`, `20250915` are pilots).
+`20251006 5S rRNA Sequencing experiment 1/`.
 
 | Panel | Script |
 |---|---|
@@ -15,6 +15,6 @@ Environment: `bioinfo_pipeline` (cutadapt, Trimmomatic, bowtie2, samtools) + Vie
 
 Cautions:
 - Use the terminal-trimmed counting branch (`4_count_trim/psysam-script-noterminal.py`, `--snv-end-trim 3`).
-- RNAfold: use `*_CORRECTED.*`; **`Folding energies.csv` is the deprecated wrong-strand output.**
+- RNAfold: the scripts fold the sense (transcript) strand.
 - Final score aggregation (Table S8) and structure schematics (ChimeraX, `VIsualizing 5S rRNA/`)
   involve manual steps — documented, not fully code-reproducible.

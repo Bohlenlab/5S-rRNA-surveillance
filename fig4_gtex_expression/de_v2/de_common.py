@@ -23,7 +23,7 @@ ROOT = os.environ.get("DE_ROOT", os.environ.get("FIVES_DATA", "data"))
 H5AD = os.environ.get("DE_H5AD", os.environ.get("FIVES_GTEX_COUNTS", "GTEx_v11_bulk_gene_counts.h5ad"))
 RNAVAF = os.environ.get("DE_RNAVAF", f"{ROOT}/results/eqtl/extreme/donor_variant_rnavaf.tsv")
 SAMPLEATTR = os.environ.get("DE_SAMPLEATTR", f"{ROOT}/metadata/GTEx_Analysis_2025-08-22_v11_Annotations_SampleAttributesDS.txt")
-SUBJPHENO = os.environ.get("DE_SUBJPHENO", f"{ROOT}/vm_archive/eqtl_inputs/SubjectPhenotypesDS.txt")
+SUBJPHENO = os.environ.get("DE_SUBJPHENO", f"{ROOT}/eqtl_inputs/SubjectPhenotypesDS.txt")
 PCS = os.environ.get("DE_PCS", f"{ROOT}/results/eqtl_inputs/genotype_20PCs.eigenvec.txt")
 
 # gene-region functional 5S variant set

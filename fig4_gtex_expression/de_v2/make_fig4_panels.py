@@ -54,7 +54,7 @@ ax.set_xlim(-4.2,0.6); fig.tight_layout(); S.save(fig,f"{FIG}/Fig4IJ_3panel_fore
 DG=pd.read_pickle(f"{E}/audit_donor_resid.pkl")
 syms=[s for s in mod if s in DG.columns]; score=DG[syms].mean(1)*100
 dm=pd.read_csv(f"{Path(os.environ.get('FIVES_DATA','data'))}/de_v2/donor_metrics.tsv",sep="\t").set_index("donor")
-sp=pd.read_csv(f"{Path(os.environ.get('FIVES_DATA','data'))}/vm_archive/eqtl_inputs/SubjectPhenotypesDS.txt",sep="\t").set_index("SUBJID")
+sp=pd.read_csv(f"{Path(os.environ.get('FIVES_DATA','data'))}/eqtl_inputs/SubjectPhenotypesDS.txt",sep="\t").set_index("SUBJID")
 white=set(sp.index[sp.RACE==3])
 def resid_on(y,x): b=np.polyfit(x,y,1); return y-(b[0]*x+b[1])
 def build(donors):
