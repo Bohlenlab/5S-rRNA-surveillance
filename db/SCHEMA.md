@@ -6,7 +6,7 @@
 
 ## 1. Purpose
 
-A hierarchical relational database of 5S rDNA tandem repeat arrays and their per-copy sequence variants across human T2T-quality assemblies. The primary coordinate reference is the CHM13 T2T 5S rDNA consensus unit (2168 bp). All assemblies, regardless of source, are compared to this single reference.
+A hierarchical relational database of 5S rDNA tandem repeat arrays and their per-copy sequence variants across human T2T-quality assemblies. Positions are numbered on the 2168 bp 5S rDNA repeat unit. The primary variant reference is the **population-majority consensus** of that unit (the `consensus_t2t` polarization): at each position the reference allele is the base carried by most copies across all haplotypes. This population consensus provides the coordinate scaffold and differs from the raw CHM13 5S unit at 8 positions.
 
 Current content (as of 2026-05-31):
 
@@ -130,7 +130,7 @@ One row. Stores the reference repeat unit used as the alignment target for all a
 |---|---|---|
 | `array_id` | INTEGER PK | Always 1 |
 | `name` | TEXT | `"5S_rDNA"` |
-| `ref_label` | TEXT | `"5S_rDNA_consensus_CHM13"` — the FASTA header used in all alignment commands |
+| `ref_label` | TEXT | Contig name of the consensus reference FASTA used in the alignment commands |
 | `sequence` | TEXT | Full 2168 bp T2T consensus nucleotide sequence |
 | `length_bp` | INTEGER | 2168 |
 | `nts_pre_start` | INTEGER | 1 (1-based, inclusive) |
@@ -146,7 +146,7 @@ The 5S rRNA gene occupies positions 630–748 (119 bp). Positions 1–629 are th
 
 ### 4.2 `assembly`
 
-One row per individual or cell line.
+One row per individual.
 
 | Column | Type | Description |
 |---|---|---|
@@ -227,11 +227,11 @@ One row per variant per copy, derived from MAFFT multiple-sequence alignments. T
 | `copy_id` | INTEGER FK | References `copy` |
 | `alignment_source` | TEXT | Which MAFFT alignment produced this variant (see §5.2) |
 | `consensus_pos` | INTEGER | **1-based position in the T2T consensus unit** (1–2168) |
-| `ref` | TEXT | Reference base(s) per the MAFFT alignment consensus. For the full-unit alignment this closely approximates the T2T reference; minor deviations are possible at hypervariable NTS positions |
+| `ref` | TEXT | Reference base(s) per the MAFFT alignment consensus. For the full-unit alignment this closely approximates the CHM13 5S unit; minor deviations are possible at hypervariable NTS positions |
 | `alt` | TEXT | Alternate base(s) observed in this copy |
 | `region` | TEXT | `"nts_pre"`, `"gene"`, or `"nts_post"` (see §5.3) |
 
-**Important:** The `ref` is the MAFFT majority-vote consensus across all copies in the haplotype, not necessarily the T2T reference sequence. At NTS positions with high copy-to-copy variation, these may differ.
+**Important:** The `ref` is the MAFFT majority-vote consensus across all copies in the haplotype, not necessarily the population consensus (or the CHM13 5S unit). At NTS positions with high copy-to-copy variation, these may differ.
 
 **Coordinate conversion applied during import:**
 
@@ -284,15 +284,17 @@ Additional HPRC HiFi and Illumina `read_variant` rows are added as the read-base
 
 ### 5.2 `variant.alignment_source`
 
-Three independent MAFFT alignments are run per haplotype. Variants from each are stored with their source labelled.
+Each copy's variants are stored under a labelled `alignment_source`. The **primary** source used throughout the study is `consensus_t2t` (variants polarized against the population-majority consensus).
 
-| Value | Input sequences | Coverage | Best use |
-|---|---|---|---|
-| `"gene_unit"` | Full ~2168 bp repeat units | All three sub-regions | 5S gene variants; cross-region overview |
-| `"nts_pre_aln"` | NTS-pre sequences only (629 bp) | NTS-pre (pos 1–629) | NTS-pre variant discovery (higher sensitivity than gene_unit in this region) |
-| `"nts_post_aln"` | NTS-post sequences only (1419 bp) | NTS-post (pos 749–2168) | NTS-post variant discovery |
+| Value | Reference | Note |
+|---|---|---|
+| `"consensus_t2t"` | Population-majority consensus of the 2168 bp unit | **Primary.** Reference allele = the base most copies carry across all haplotypes; used for the population-genetic and gene-conversion analyses. |
+| `"gene_unit_t2t"` | Raw CHM13 T2T 5S unit | Variants relative to the CHM13 unit (differs from the population consensus at 8 positions). |
+| `"gene_unit"` | Per-haplotype MAFFT consensus | Full ~2168 bp repeat-unit alignment; variants relative to each haplotype's own majority-vote consensus. |
+| `"nts_pre_aln"` | Per-haplotype MAFFT, NTS-pre only (pos 1–629) | Higher NTS-pre sensitivity than `gene_unit`. |
+| `"nts_post_aln"` | Per-haplotype MAFFT, NTS-post only (pos 749–2168) | Higher NTS-post sensitivity. |
 
-For NTS variants, the region-specific alignments (`nts_pre_aln`, `nts_post_aln`) are more sensitive because the full-unit alignment is dominated by the conserved gene region. Typical copy 1 example: 1 NTS-pre variant in `gene_unit` vs 90 in `nts_pre_aln`.
+The region-specific MAFFT alignments (`nts_pre_aln`, `nts_post_aln`) are more sensitive for NTS variant discovery because the full-unit alignment is dominated by the conserved gene region.
 
 ### 5.3 `variant.region` / `read_variant.region`
 
@@ -333,7 +335,7 @@ All 97 haplotypes currently have `strand = "minus"`, meaning the 5S array is on 
 | `"identical"` | `n_snv_5s_gene = 0` — no variants in the 119 bp 5S gene relative to the MAFFT consensus | 6,964 (86%) |
 | `"highly_similar"` | `n_snv_5s_gene > 0` — at least one variant in the 5S gene | 1,126 (14%) |
 
-Note: these categories reflect variation relative to the per-haplotype MAFFT consensus, not the T2T reference. A copy that is "identical" may still differ from the T2T reference if the consensus differs.
+Note: these categories reflect variation relative to the per-haplotype MAFFT consensus, not the population consensus. A copy that is "identical" may still differ from the population consensus if the consensus differs.
 
 ---
 
@@ -367,7 +369,7 @@ Sub-regions (approximate positions):
 
 ## 7. Known Limitations and Caveats
 
-**MAFFT consensus vs T2T reference.** Variants in the `variant` table are relative to the MAFFT majority-vote consensus of each haplotype's copies, not the T2T reference directly. At highly variable NTS positions, the MAFFT consensus may differ from the T2T reference by 1–2 bases, making `ref` in the variant table unreliable as an absolute reference. For gene-region variants this is not a concern (the gene is conserved enough that the MAFFT consensus = T2T reference at all positions).
+**MAFFT consensus vs the population consensus.** Variants in the `variant` table are relative to the MAFFT majority-vote consensus of each haplotype's copies, not the population consensus directly. At highly variable NTS positions, the MAFFT consensus may differ from the population consensus by 1–2 bases, making `ref` in the variant table unreliable as an absolute reference. For gene-region variants this is not a concern (the gene is conserved enough that the MAFFT consensus matches the population consensus at all positions). For polarized, absolute-reference variants use the `consensus_t2t` source.
 
 **Border copies.** The first and last copy of each array have inflated NTS variant counts because the extraction window extends into non-repetitive flanking sequence. Exclude `border_note IN ('5-prime_array_border', '3-prime_array_border')` from NTS variant rate analyses.
 
