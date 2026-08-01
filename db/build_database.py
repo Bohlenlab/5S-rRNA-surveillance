@@ -144,7 +144,7 @@ CREATE TABLE IF NOT EXISTS array_reference (
 CREATE TABLE IF NOT EXISTS assembly (
     assembly_id      INTEGER PRIMARY KEY AUTOINCREMENT,
     sample_id        TEXT NOT NULL UNIQUE,
-    cohort           TEXT NOT NULL,        -- "HPRC_Year1", "CHM13", "HG002_GIAB", "REH"
+    cohort           TEXT NOT NULL,        -- "HPRC_Year1", "CHM13", "HG002_GIAB"
     population       TEXT,                 -- e.g. "CHS"
     superpopulation  TEXT,                 -- e.g. "EAS"
     sex              TEXT,                 -- "M", "F", NULL if unknown
