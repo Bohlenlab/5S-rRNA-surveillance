@@ -65,8 +65,8 @@ os.environ.setdefault("OMP_NUM_THREADS", "1")
 
 T2T_DIR    = Path(os.environ.get("FIVES_DATA", "data"))
 DB_5S      = Path(os.environ.get("FIVES_DB", "5S_rDNA.db"))
-TRNA_DIR   = Path(os.environ.get("FIVES_DATA", "data"))
-ASSOC_FILE = TRNA_DIR / "5S_rRNA_Analysis" / "association_input.tsv"
+BASE_DIR   = Path(os.environ.get("FIVES_DATA", "data"))
+ASSOC_FILE = BASE_DIR / "5S_rRNA_Analysis" / "association_input.tsv"
 COHORT_DB  = Path(os.environ.get("FIVES_ICD10_DB", "cohort_icd10.db"))
 OUT_DIR    = Path(os.environ.get("FIVES_OUT", "output")) / "81_results"
 FIG_DIR    = Path(os.environ.get("FIVES_OUT", "output")) / "02_variant_calling_qc"
