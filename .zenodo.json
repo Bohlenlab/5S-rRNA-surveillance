@@ -1,0 +1,29 @@
+{
+  "title": "Analysis code for: Surveillance and selection of 5S ribosomal RNA genes in the human genome",
+  "upload_type": "software",
+  "description": "Analysis code accompanying Sengl et al., \"Surveillance and selection of 5S ribosomal RNA genes in the human genome.\" The repository is organised by manuscript figure and includes a panel-to-script manifest, captured software environments, database build and query scripts, public reference inputs, and reusable methods. Controlled-access human data are referenced by accession and are not included.",
+  "creators": [
+    {
+      "name": "Bohlen, Jonathan",
+      "affiliation": "Gene Center, Ludwig-Maximilians-Universität München"
+    }
+  ],
+  "license": "MIT",
+  "access_right": "open",
+  "keywords": [
+    "5S rDNA",
+    "ribosomal DNA",
+    "tandem repeat",
+    "ribosome",
+    "p53",
+    "population genetics",
+    "variant calling"
+  ],
+  "related_identifiers": [
+    {
+      "relation": "isSupplementTo",
+      "identifier": "https://github.com/Bohlenlab/5S-rRNA-surveillance",
+      "scheme": "url"
+    }
+  ]
+}

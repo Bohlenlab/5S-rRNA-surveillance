@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+title: "Analysis code for: Surveillance and selection of 5S ribosomal RNA genes in the human genome"
+message: "If you use this software, please cite the associated paper."
+type: software
+authors:
+  - family-names: Bohlen
+    given-names: Jonathan
+    affiliation: "Gene Center, Ludwig-Maximilians-Universität München"
+    email: j.bohlen@lmu.de
+license: MIT
+repository-code: "https://github.com/Bohlenlab/5S-rRNA-surveillance"
+keywords:
+  - 5S rDNA
+  - ribosomal DNA
+  - tandem repeat
+  - ribosome
+  - p53
+  - population genetics
+  - variant calling
