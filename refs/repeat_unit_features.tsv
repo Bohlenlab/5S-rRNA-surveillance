@@ -1,0 +1,14 @@
+feature	start	end	length	class	description
+5'_external_spacer	1	629	629	spacer	5' non-transcribed spacer (G-rich)
+CpG_microsatellite	9	21	13	lowcomplex	(CG)n CpG-rich microsatellite
+GT_rich_lowcomplex	34	93	60	lowcomplex	(GT)n / G-rich low-complexity (CpG-island-like 5' junction)
+5S_rRNA_gene	630	749	120	gene	5S rRNA gene, Pol III type-1 (100% id)
+ICR_BoxA	679	693	15	promoter	Internal control region: Box A
+ICR_IE	696	701	6	promoter	Internal control region: Intermediate Element
+ICR_BoxC	709	726	18	promoter	Internal control region: Box C
+PolIII_terminator	750	765	16	terminator	Pol III terminator (oligo-dT)
+Alu_SINE	787	1066	280	alu	Alu SINE, AluY-related, antisense, ~93% id
+polymorphic_indel	1181	1190	10	indel	GC-rich polymorphic indel (84% del)
+CT_microsatellite	1916	1968	53	lowcomplex	CT-rich pyrimidine microsatellite
+CTGT_microsatellite	2009	2155	147	lowcomplex	(CTGT/CTCT)n pyrimidine microsatellite (TRF period-8, 8 copies)
+3'_external_spacer	766	2168	1403	spacer	3' non-transcribed spacer (C-rich)

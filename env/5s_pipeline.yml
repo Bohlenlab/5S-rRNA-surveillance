@@ -235,4 +235,3 @@ dependencies:
       - urllib3==2.7.0
       - wrapt==2.2.1
       - zarr==3.1.6
-prefix: /home/j.bohlen/miniconda3/envs/5s_pipeline

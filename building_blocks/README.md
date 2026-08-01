@@ -3,6 +3,10 @@
 The transferable computational ideas from the study, factored out and documented so they can be
 reused on other loci. Each maps back to the figure code (see `../CODE_MANIFEST.md`).
 
+`collapsed_array_caller_demo.py` is a self-contained, dependency-free demonstration of the
+collapsed-array low-VAF caller (building block 1). It runs in under a second and needs no external
+data or packages.
+
 1. **Collapsed-array short-read variant caller** — map short reads to a single consensus repeat
    unit so all array copies pool into one pileup; call at low VAF; rescue apparent false positives
    with orthogonal long reads; set the threshold by F1. (from `5S_setup` + `74/75`, `61–73`)
@@ -21,5 +25,3 @@ reused on other loci. Each maps back to the figure code (see `../CODE_MANIFEST.m
    covariate-adjusted NB-GLM per tissue, inverse-variance meta, prerank GSEA. (`de_v2`)
 8. **p53-stratified genomic-dose → RP-repression interaction** — expanded p53 classification and
    dose × p53-status interaction on the cytosolic-RP module. (`cancer_5S`)
-
-Status: descriptions in place; generalized code to be lifted from the figure folders during curation.

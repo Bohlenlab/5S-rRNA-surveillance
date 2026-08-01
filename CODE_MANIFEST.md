@@ -1,25 +1,26 @@
-# 5S rDNA paper — code archive manifest (DRAFT)
+# 5S rDNA paper — code archive manifest
 
 Sengl et al., "Surveillance and selection of 5S ribosomal RNA genes in the human genome."
-Scope: share **code + conceptual building blocks**, not data and not infrastructure.
-Controlled data (UKBB, GTEx phs000424, TCGA phs000178, CPTAC phs001287, CPC) is never included —
-the repo references accessions + access paths only. Panel-for-panel raw-data reproduction is NOT a goal;
-the goal is that a competent bioinformatician can read each method and adapt it.
+This manifest maps each manuscript figure panel to the script that produced it. Code and
+conceptual building blocks are shared; data and infrastructure are not. Controlled data
+(UKBB, GTEx phs000424, TCGA phs000178, CPTAC phs001287, CPC) is never included — the repo
+references accessions and access paths only.
 
-Legend: ★ = canonical script to archive · [Mac] local · [imm] immuno2 · [trr] trr237/server2 · [RAP] DNAnexus.
+Legend: ★ = canonical script · [local] local · [server] compute server · [RAP] UK Biobank Research Analysis Platform.
 
 ---
 
-## 1. Proposed repo layout
+## 1. Repo layout
 
 ```
 5S_paper_code/
   README.md                     # overview, data-access statement, how to read this repo
-  CODE_MANIFEST.md              # this file (panel -> script provenance)
-  env/                          # captured conda envs (per server), + a curated env.yml
-    5s_pipeline.immuno2.yml
-    5s_pipeline.trr237.yml
-    fiberseq.trr237.yml
+  CODE_MANIFEST.md              # this file (panel -> script index)
+  env/                          # captured conda envs
+    5s_pipeline.yml
+    5s_pipeline.alt.yml
+    fiberseq.yml
+    bioinfo_pipeline.yml
   refs/                         # consensus unit FASTA, feature map, gene sets (public only)
   db/                           # schema + build/query scripts (NOT the populated DB)
   fig1_array_geneconversion/
@@ -28,22 +29,22 @@ Legend: ★ = canonical script to archive · [Mac] local · [imm] immuno2 · [tr
   fig4_gtex_expression/
   fig5_saturation_mutagenesis/
   fig6_cancer_selection/
-  building_blocks/              # the ~8 reusable methods, lightly generalized + documented
+  building_blocks/              # the reusable methods, generalized + documented
 ```
 
-Each `figN_*/` gets a short README that (a) lists the panels it makes, (b) names the input
-tables/DB it reads, (c) states the data-access requirement. Hardcoded paths are lifted to a
-`config` block at the top of each script (or a small `paths.py`).
+Each `figN_*/` has a short README that (a) lists the panels it makes, (b) names the input
+tables/DB it reads, and (c) states the data-access requirement. Hardcoded paths are lifted to a
+config block at the top of each script.
 
 ---
 
-## 2. Panel -> final script (pinned via `HPRC/manuscript_tables` READMEs)
+## 2. Panel -> script
 
-NOTE: `manuscript_tables` uses an EARLIER figure-numbering than the V8 manuscript. Mapping is by
-SCRIPT, not panel letter. Where they differ, V8 letters are given in ( ).
+Mapping is by script. Where the working figure-numbering differs from the manuscript, manuscript
+letters are given in ( ).
 
-### Figure 1 — array structure & gene conversion   (all [Mac] `HPRC/scripts`)
-| V8 panel | Analysis | ★ Script |
+### Figure 1 — array structure & gene conversion   ([local])
+| Panel | Analysis | ★ Script |
 |---|---|---|
 | 1B | per-copy variant map (HG002) | `26_array_maps.py` |
 | 1C/S1A | copy number | `07_array_structure_analysis.py` |
@@ -57,82 +58,82 @@ SCRIPT, not panel letter. Where they differ, V8 letters are given in ( ).
 | S2/Table S2 | repeat-unit annotation | `44_repeat_unit_annotation.py` |
 | DB build | consensus + catalog | `build_database.py`, `12_consensus_rederive.py`, multi-contig `57–60b` |
 
-### Figure 2 — short-read caller + UKBB   (SPLIT across [Mac]/[trr]/[imm]/[RAP])
-| V8 panel | Analysis | ★ Script | Where |
+### Figure 2 — short-read caller + UKBB
+| Panel | Analysis | ★ Script | Where |
 |---|---|---|---|
-| 2A,2B | SR vs assembly VAF; HiFi rescue | `75_platform_comparison.py` | [Mac] |
-| 2C | calls-by-group vs VAF (sens 83/prec 69) | `74_summary_figure.py` | [Mac] |
-| S2A,B | pseudogene specificity (sim reads) | `figS_pseudogene.py` + `WGS-Variant-Identification/` sim | [Mac] |
-| S2C | HPRC SR coverage | `13c_hprc_sr_coverage_S2C.py` | [Mac] |
-| pipeline | UKBB read extraction (full CRAMs) | **RAP applet — TO RETRIEVE/DESCRIBE** | [RAP] |
-| pipeline | extraction→align→variant→trio-QC | `5S_setup/{0,1,2,4,6}_*` | ★[trr] |
-| 2D | carrier landscape | `78a_panel_A_export.py` | [Mac] |
-| 2F(=t.2E) | UKBB vs assembly VAF concordance | `93_ukbb_assembly_consistency.py` | [Mac]/[imm] |
-| 2G(=t.2F) | twin/parent-child sharing | `94_heritability_vaf.py` | [Mac] |
-| S2D | Falconer midparent heritability | `94_...` (falconer mode) | [Mac] |
-| 2H(=t.2G) | gene-conversion by UKBB VAF | `93b_ukbb_assembly_consistency_all.py` | [Mac] |
-| 2I(=t.2H) | variants per UKBB carrier | carriers table (`76_import_ukbb_population.py`) | [imm] |
-| 2J(=t.2I) | ICD-10 positional enrichment | `95_icd10_positional_enrichment.py` | [imm] |
-| 2K,2L(=t.2J) | dosage-OR curves (OCD/SSc) | `85_dosage_or_curves.py` | [imm] |
-| PheWAS core | ICD-10 dosage logistic regressions | `81_ukbb_phenotype_associations.py` | ★[imm] (vs `cohort_icd10.db`) |
-| S2C landscape | UKBB variant landscape | `78_/79_ukbb_variant_landscape*.py` | [imm] |
-| selection setup | UKBB purifying selection | `80_ukbb_purifying_selection.py` | [imm] |
-SR-caller calibration backbone (not all panelled): `61–73` [Mac] (VAF sweep, filter tests, rescue nulls `fig2_rescue_*`).
+| 2A,2B | SR vs assembly VAF; HiFi rescue | `75_platform_comparison.py` | [local] |
+| 2C | calls-by-group vs VAF | `74_summary_figure.py` | [local] |
+| S2A,B | pseudogene specificity (sim reads) | `figS_pseudogene.py` + `WGS-Variant-Identification/` sim | [local] |
+| S2C | HPRC SR coverage | `13c_hprc_sr_coverage_S2C.py` | [local] |
+| pipeline | UKBB read extraction (full CRAMs) | runs on the UK Biobank Research Analysis Platform; described in Methods, not included | [RAP] |
+| pipeline | extraction→align→variant→trio-QC | `5S_setup/{0,1,2,4,6}_*` | [server] |
+| 2D | carrier landscape | `78a_panel_A_export.py` | [local] |
+| 2F(=t.2E) | UKBB vs assembly VAF concordance | `93_ukbb_assembly_consistency.py` | [local] |
+| 2G(=t.2F) | twin/parent-child sharing | `94_heritability_vaf.py` | [local] |
+| S2D | Falconer midparent heritability | `94_...` (falconer mode) | [local] |
+| 2H(=t.2G) | gene-conversion by UKBB VAF | `93b_ukbb_assembly_consistency_all.py` | [local] |
+| 2I(=t.2H) | variants per UKBB carrier | carriers table (`76_import_ukbb_population.py`) | [server] |
+| 2J(=t.2I) | ICD-10 positional enrichment | `95_icd10_positional_enrichment.py` | [server] |
+| 2K,2L(=t.2J) | dosage-OR curves (OCD/SSc) | `85_dosage_or_curves.py` | [server] |
+| PheWAS core | ICD-10 dosage logistic regressions | `81_ukbb_phenotype_associations.py` (vs `cohort_icd10.db`) | [server] |
+| S2C landscape | UKBB variant landscape | `78_/79_ukbb_variant_landscape*.py` | [server] |
+| selection setup | UKBB purifying selection | `80_ukbb_purifying_selection.py` | [server] |
+SR-caller calibration backbone (not all panelled): `61–73` [local] (VAF sweep, filter tests, rescue nulls `fig2_rescue_*`).
 
-### Figure 3 — methylation & accessibility   (SPLIT)
-| V8 panel | Analysis | ★ Script | Where |
+### Figure 3 — methylation & accessibility
+| Panel | Analysis | ★ Script | Where |
 |---|---|---|---|
-| 3A/S3A,B | array methylation vs position (ONT/HiFi) | `40_methylation_full215*.py` | [Mac]+[imm/trr] stream |
-| 3B/S3C | per-copy methylation distribution | `40_...` / `41_methylation_overview*.py` | [Mac] |
-| 3C,D(class)/S3F,G | within-copy positional by class | `40_methylation_full215.py` (★ authoritative) | [Mac] |
-| 3E(=dosage) | dosage compensation (set-point) | `40_...` + `36_lowmeth_copies_donor_stability.py` | [Mac] |
-| 3F,G,H | whole-copy meth by variant count | `60_variant_hypo_proportion*.py` (+`24b–g`) | [Mac] |
-| 3(edge)/S3D,E | array-edge / border methylation | `62_/64_border|array_end...` , `65_/66_` | [Mac] |
-| 3E,F(fiberseq)/S3H,I | Fiber-seq m6A accessibility | `fiberseq_5S/scripts/build_spanning_figure.py`, `within_copy_profile_pub.py` | ★[Mac]+[trr] stream |
-| S3K,L | 45S NOR edge methylation | `45S_methylation/scripts/{00–04}` | ★[Mac]+[imm+trr] (both halves) |
-| S3M | RNU2 own-assembly methylation | `rDNA_dosage_control/09.../RNU2/compute_rnu2_ownasm.py` | [Mac] |
-| S3N | edge-biased gene-body variation | `nascent_edge_analysis/edge_analysis.py`,`edge_expression.py` | [Mac] |
-| DB meth table | build `copy_methylation` | `37_/38_export|load_copy_methylation*.py`, `60_multicontig_methylation.py` | [Mac]+[imm] |
+| 3A/S3A,B | array methylation vs position (ONT/HiFi) | `40_methylation_full215*.py` | [local] (+ server stream) |
+| 3B/S3C | per-copy methylation distribution | `40_...` / `41_methylation_overview*.py` | [local] |
+| 3C,D(class)/S3F,G | within-copy positional by class | `40_methylation_full215.py` (★ authoritative) | [local] |
+| 3E(=dosage) | dosage compensation (set-point) | `40_...` + `36_lowmeth_copies_donor_stability.py` | [local] |
+| 3F,G,H | whole-copy meth by variant count | `60_variant_hypo_proportion*.py` (+`24b–g`) | [local] |
+| 3(edge)/S3D,E | array-edge / border methylation | `62_/64_border|array_end...` , `65_/66_` | [local] |
+| 3E,F(fiberseq)/S3H,I | Fiber-seq m6A accessibility | `fiberseq_5S/scripts/build_spanning_figure.py`, `within_copy_profile_pub.py` | [local] (+ server stream) |
+| S3K,L | 45S NOR edge methylation | `45S_methylation/scripts/{00–04}` | [local] (+ server stream) |
+| S3M | RNU2 own-assembly methylation | `rDNA_dosage_control/09.../RNU2/compute_rnu2_ownasm.py` | [local] |
+| S3N | edge-biased gene-body variation | `nascent_edge_analysis/edge_analysis.py`,`edge_expression.py` | [local] |
+| DB meth table | build `copy_methylation` | `37_/38_export|load_copy_methylation*.py`, `60_multicontig_methylation.py` | [local] (+ server stream) |
 
-### Figure 4 — GTEx expression   ([Mac] `GTEx/` + ★[trr] `de_v2` run)
-| V8 panel | Analysis | ★ Script |
+### Figure 4 — GTEx expression   ([local] `GTEx/` + `de_v2` run on [server])
+| Panel | Analysis | ★ Script |
 |---|---|---|
 | 4B | RNA-seq depth profile | `fig4_coverage_pooldata.py`+`fig4_coverage_panel.py` |
 | 4C | per-variant carrier vs non-carrier | `fig4_panel4_pooldata.py`+`fig4_build_panels.py` |
 | 4D | rank-skew volcano | `fig4_build_panels.py` (from `wgs_rna_rank_skew.py`) |
 | 4E | expressed-variant distribution | `fig4_p3_detection.py` |
-| 4F | prevalence (AUC q99) | `fig4_panel4_build.py`  *(DECISION: q99 37% vs strict 14% — pick one)* |
+| 4F | prevalence of expressed variants (strict, ~14%) | `genotyping_expression/prevalence_strict.py` |
 | 4G | DNA vs RNA VAF | `fig4_build_panels.py` |
 | 4H | trans-effect volcano | `ex05j_p10_4x4_biogenesis.py` (DE from `ex05e_fullmodel_gsea.py`) |
 | 4I,J,K,L | dose-response + GSEA + meta | `ex05g_dnarna_vaf_panel.py`, `de_v2/{de_common,de_meta,de_gsea}.py` |
 | genotyping | GTEx WGS/RNA 5S VAF | `GTEx/scripts/{10–14,20,23}` |
-DE executed run + logs: ★[trr] `~/de_v2/` (`meta/SUMMARY.tsv`). Superseded: `figures/de_expression`, `eq*`, `ex0[1-4]`, `vm_archive`.
+DE run + logs: `de_v2/` on [server] (`meta/SUMMARY.tsv`). Superseded: `figures/de_expression`, `eq*`, `ex0[1-4]`, `vm_archive`.
 
-### Figure 5 — saturation mutagenesis   ([Mac] dated folders + `de_v2`)
-| V8 panel | Analysis | ★ Script |
+### Figure 5 — saturation mutagenesis   ([local] dated folders + `de_v2`)
+| Panel | Analysis | ★ Script |
 |---|---|---|
 | 5C–G | fraction-seq → expr/incorporation scores | `20251006 5S rRNA Sequencing experiment 1/` (`5S/`+`GFP/` stages → `process_rep_mutation_ratios.py`) |
 | 5(region E/G) | region expr/incorp panels | `GTEx/de_v2/make_fig5_region.py` |
 | S5F | RNAfold ΔΔG | `RNA-fold/regenerate_sense_folding.py` (+`make_folding_figure.py`) — use `*_CORRECTED.*`, NOT `Folding energies.csv` |
 | load | functional scores → DB | `T2T/scripts/load_functional_annotation.py` |
 | S5D | expression by ICR region | part of fraction-seq analysis |
-Structure schematics (5D/F, S5E): `VIsualizing 5S rRNA/` (ChimeraX 8BGU) — not code-reproducible (documented).
+Structure schematics (5D/F, S5E): `VIsualizing 5S rRNA/` (ChimeraX 8BGU) — assembled manually, not code-reproducible.
 
-### Figure 6 — cancer p53 + cross-cohort selection   (SPLIT)
-| V8 panel | Analysis | ★ Script | Where |
+### Figure 6 — cancer p53 + cross-cohort selection
+| Panel | Analysis | ★ Script | Where |
 |---|---|---|---|
-| 6A–C | function-stratified trans-effects (IE) | `de_v2/make_figs3to6.py` (+`make_fig13_IE_*`) | [Mac]/[trr] |
-| 6D–L | cancer p53-stratified DE, GSEA | `cancer_5S/surveillance_v2/` + `scripts/{03_slice_call,54–77}` | ★[imm] run → [Mac] figs |
-| 6Q | somatic 5S gains × p53 | `cancer_5S/scripts/{100–111}` | [imm] |
-| 6M–P | cross-cohort selection (HPRC/UKBB/GTEx) | `97_incorporation_depletion_three_cohort.py`, `98_binary_classifications_two_ways.py`, `2E_fair_perdonor_vaf.py`, `de_v2/make_figs3to6.py` | [Mac] |
-| S6A | methylation by variant consequence | `24_gene_methylation_by_functional_consequence.py` (+`24b–g`) | [Mac] |
-| robustness | substitution-covariate control | `97c_substitution_covariate_robustness.py` | [Mac] |
-| support | MDM2–p53 structure | `MDM2/1RV1.cif` (asset) | [Mac] |
+| 6A–C | function-stratified trans-effects (IE) | `de_v2/make_figs3to6.py` (+`make_fig13_IE_*`) | [local]/[server] |
+| 6D–L | cancer p53-stratified DE, GSEA | `cancer_5S/surveillance_v2/` + `scripts/{03_slice_call,54–77}` | [server] run → [local] figs |
+| 6Q | somatic 5S gains × p53 | `cancer_5S/scripts/{100–111}` | [server] |
+| 6M–P | cross-cohort selection (HPRC/UKBB/GTEx) | `97_incorporation_depletion_three_cohort.py`, `98_binary_classifications_two_ways.py`, `2E_fair_perdonor_vaf.py`, `de_v2/make_figs3to6.py` | [local] |
+| S6A | methylation by variant consequence | `24_gene_methylation_by_functional_consequence.py` (+`24b–g`) | [local] |
+| robustness | substitution-covariate control | `97c_substitution_covariate_robustness.py` | [local] |
+| support | MDM2–p53 structure | `MDM2/1RV1.cif` (asset) | [local] |
 
 ---
 
-## 3. Reusable building blocks (the shareable "conceptual" core)
-1. **Collapsed-array short-read caller** — map to a single consensus repeat unit, low-VAF calling, HiFi rescue, F1-calibrated threshold (`5S_setup` + `74/75/61–73`). *Explicitly pitched in the Discussion as a template for other collapsed arrays.*
+## 3. Reusable building blocks
+1. **Collapsed-array short-read caller** — map to a single consensus repeat unit, low-VAF calling, HiFi rescue, F1-calibrated threshold (`5S_setup` + `74/75/61–73`). A runnable, dependency-free demo is in `building_blocks/collapsed_array_caller_demo.py`.
 2. **Multi-contig per-copy array reconstruction & ordering** (`57–60b`).
 3. **Runs-based within-array clustering index** (Wald–Wolfowitz) (`31`/`47`).
 4. **Content-adjusted regional SFS** (`27`).
@@ -143,25 +144,28 @@ Structure schematics (5D/F, S5E): `VIsualizing 5S rRNA/` (ChimeraX 8BGU) — not
 
 ---
 
-## 4. Environments (captured 2026-08-01)
-- `5s_pipeline` differs by server — archive BOTH snapshots and note which analysis used which:
-  - immuno2: samtools 1.23, bcftools 1.21, bwa 0.7.19, minimap2 2.30, modkit 0.6.1, pydeseq2 0.5.4, gseapy — used for cancer GDC, HPRC streaming, 45S half1.
-  - trr237: samtools 1.6, bcftools 1.9, bwa 0.7.18, minimap2 2.28, modkit 0.4.1, pydeseq2 0.5.4, gseapy 1.3.0 — used for UKBB extraction, GTEx de_v2, 45S half2, fiberseq.
-- `fiberseq` (trr237): fibertools-rs 0.9.0, winnowmap 2.03.
-- Wet-lab (Fig 5): `bioinfo_pipeline` (cutadapt/Trimmomatic/bowtie2/samtools) + ViennaRNA — env not yet captured (local Mac).
+## 4. Environments
+- `5s_pipeline` — the core analysis environment, provided as two captured snapshots
+  (`5s_pipeline.yml`, `5s_pipeline.alt.yml`) with minor tool-version differences (e.g. samtools,
+  modkit). Python analysis libraries (pydeseq2, gseapy, statsmodels, scikit-learn) match across both.
+- `fiberseq` — Fiber-seq tools (fibertools-rs, winnowmap, meryl).
+- `bioinfo_pipeline` — saturation-mutagenesis / functional-assay analysis (cutadapt, Trimmomatic,
+  bowtie2, samtools, ViennaRNA).
 
 ---
 
-## 5. Excluded (present in tree, NOT in paper)
-Evo_5S (cross-species); all Hi-C (`HiC/`, `hic_analysis`, `scripts/hic`); most `rDNA_dosage_control` (08 tRNA-chr6, 01 chromatin/H3K27me3, 03/07 planning); REH (confirmed not used); pilots (`20250603`, `20250915`, `T2T/README` CHM13/HG002 pilot, GTEx `de_expression`/`eq*`/`vm_archive`, cancer v1 `figures/`+`results_*`, Trios/Trios_2.0, `Folding energies.csv`).
+## 5. Excluded (present in the working tree, NOT in the paper)
+Evo_5S (cross-species); Hi-C (`HiC/`, `hic_analysis`, `scripts/hic`); most `rDNA_dosage_control`;
+pilots (`20250603`, `20250915`, CHM13/HG002 pilot, GTEx `de_expression`/`eq*`/`vm_archive`,
+cancer v1 `figures/`+`results_*`, Trios/Trios_2.0, `Folding energies.csv`).
 
 ---
 
-## 6. Open decisions / gaps
-- **[D1] UKBB RAP extraction code** — retrieve the DNAnexus applet/script, or describe in Methods only? (It's the one missing code step.)
-- **[D2] Fig 4F prevalence number** — 37% (AUC q99) vs 14% (strict); the Figure-4 README flags "pick one before submission."
-- **[D3] DB** — ship schema+build scripts only (agreed); confirm no populated DB shipped.
-- **[D4] Path handling** — lift hardcoded `/home/j.bohlen`, `/home/bohlen_lab`, `/Users/bohlen` (237/68/336 files) to per-script config blocks during curation.
-- **[D5] HPRC/scripts README** only indexes 01–56; 57–99 (UKBB, SR calibration, selection) undocumented — extend during curation.
-- **[D6] Wet-lab env** (`bioinfo_pipeline`) still to capture from the Mac.
-- **[D7] Manual steps** (Prism/Excel/Affinity) behind a few panels — document as "assembled in GraphPad/Illustrator" in the figure READMEs.
+## 6. Scope and boundaries
+- Controlled data (UKBB, GTEx phs000424, TCGA phs000178, CPTAC phs001287, CPC) is referenced by
+  accession and is not included; obtain it through the listed access paths.
+- The upstream UK Biobank read-extraction step runs on the UK Biobank Research Analysis Platform
+  and is described in the Methods; it is not part of this repository.
+- The populated database is not shipped; only the schema and build/query scripts are included.
+- Some final panels were assembled in GraphPad Prism / Adobe Illustrator from the tables the
+  scripts emit; those steps are noted in each figure's README.

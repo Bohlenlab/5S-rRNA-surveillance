@@ -69,4 +69,3 @@ dependencies:
   - sra-tools=3.4.1=2_linux_64
   - winnowmap=2.03=h5ca1c30_4
   - zstd=1.5.7=hb78ec9c_6
-prefix: /home/bohlen_lab/miniconda3/envs/fiberseq

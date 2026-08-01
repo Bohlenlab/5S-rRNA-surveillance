@@ -11,7 +11,7 @@ Functional assay generated here (raw reads: GEO GSE339543). Definitive experimen
 | S5F RNAfold ΔΔG | `RNA-fold/regenerate_sense_folding.py` + `make_folding_figure.py` |
 | load scores → DB | `T2T/scripts/load_functional_annotation.py` |
 
-Environment: `bioinfo_pipeline` (cutadapt, Trimmomatic, bowtie2, samtools) + ViennaRNA — to capture (D6).
+Environment: `bioinfo_pipeline` (cutadapt, Trimmomatic, bowtie2, samtools) + ViennaRNA (see `../env/`).
 
 Cautions:
 - Use the terminal-trimmed counting branch (`4_count_trim/psysam-script-noterminal.py`, `--snv-end-trim 3`).

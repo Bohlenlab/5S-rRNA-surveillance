@@ -11,7 +11,7 @@ index**: it maps every figure panel to the exact script that produced it.
 - **Code, yes.** The scripts that implement the analyses and the novel methods.
 - **Data, no.** All human-subjects data is controlled-access and is *not* redistributed here. The
   repository references datasets by accession; obtain them through the paths below.
-- **Infrastructure, no.** Compute ran on institutional Linux servers; server paths and job
+- **Infrastructure, no.** Compute ran on a Linux compute server; server paths and job
   scripts are not part of the release. Captured software environments are in `env/`.
 - **Not every panel is reproducible end-to-end from raw data.** Some final panels were assembled
   in GraphPad Prism / Adobe Illustrator from the tables the scripts emit; those steps are noted in
@@ -35,7 +35,7 @@ index**: it maps every figure panel to the exact script that produced it.
 ## Layout
 
 ```
-env/                        captured conda environments (per server; see env/README.md)
+env/                        captured conda environments (see env/README.md)
 refs/                       consensus repeat unit, feature map, gene sets (public inputs)
 db/                         5S_rDNA.db schema + build/query scripts (DB itself not shipped)
 fig1_array_geneconversion/  Fig 1 + S1
@@ -50,11 +50,12 @@ CODE_MANIFEST.md            panel -> script index (start here)
 
 ## Software environment
 
-Analyses used a conda environment (`5s_pipeline`) plus a few specialized envs. The exact,
-versioned exports are in `env/`. Note that the environment drifted between the two compute
-servers; `CODE_MANIFEST.md` records which environment each analysis used. Core tools: Python 3.11
-(NumPy, pandas, SciPy, statsmodels, pysam, pydeseq2, gseapy), samtools/bcftools, bwa, minimap2,
-BLAST+, MAFFT, modkit; ViennaRNA + bowtie2/cutadapt for the functional assay.
+Analyses used the core analysis environment `5s_pipeline` (provided as two captured snapshots
+with minor tool-version differences), `fiberseq` for the Fiber-seq tools, and `bioinfo_pipeline`
+for the saturation-mutagenesis / functional-assay analysis. The exact, versioned exports are in
+`env/`. Core tools: Python 3.11 (NumPy, pandas, SciPy, statsmodels, pysam, pydeseq2, gseapy),
+samtools/bcftools, bwa, minimap2, BLAST+, MAFFT, modkit; ViennaRNA + bowtie2/cutadapt for the
+functional assay.
 
 ## Running the scripts
 
@@ -64,10 +65,8 @@ Scripts read paths from environment variables, with in-repo defaults:
 |---|---|---|
 | `FIVES_DB` | path to `5S_rDNA.db` (not distributed) | `5S_rDNA.db` |
 | `FIVES_OUT` | output directory for figures/tables | `output` |
-| `FIVES_REFS` | public reference inputs | `refs` |
+| `FIVES_DATA` | derived-data inputs (per-donor tables, pileups, exports) | `data` |
+| `FIVES_REFS` | public reference inputs (`refs/`) | `refs` |
+| `FIVES_BIN` | directory of external tool binaries, if not on `PATH` | (uses `PATH`) |
 
 Example: `FIVES_DB=/path/to/5S_rDNA.db python fig1_array_geneconversion/31_variant_clustering_runs.py`
-
-> Status: assembly in progress. The scaffold, environments, and manifest are in place; per-figure
-> scripts are being curated from the working tree into each folder (paths lifted to the variables
-> above; author/copyright header added; comments reduced to a description of the code and method).
