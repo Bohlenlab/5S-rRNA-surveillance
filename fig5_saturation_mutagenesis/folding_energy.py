@@ -15,13 +15,12 @@ transcript, computes the whole-molecule minimum free energy (MFE) via ViennaRNA
 RNAfold (default parameters, 37 C) and the folding-energy change
     ddG = MFE(mutant) - MFE(WT)   [kcal/mol]
 where positive ddG is destabilizing and negative ddG is stabilizing. Positions
-are numbered 5'->3' along the transcript. Sense-strand outputs carry a
-_CORRECTED suffix.
+are numbered 5'->3' along the transcript.
 
 Outputs (under FIVES_OUT):
-  - 5S-rRNA_sense_CORRECTED.fa                    WT sense-strand FASTA
-  - RNAfold_sense_per_variant_CORRECTED.csv       per-variant MFE/ddG table
-  - Folding_energies_sense_matrix_CORRECTED.csv   position x base ddG matrix
+  - 5S-rRNA_sense.fa                    WT sense-strand FASTA
+  - RNAfold_sense_per_variant.csv       per-variant MFE/ddG table
+  - Folding_energies_sense_matrix.csv   position x base ddG matrix
 """
 import RNA, pandas as pd, os
 
@@ -47,15 +46,15 @@ for i, ref in enumerate(SENSE):
 d = pd.DataFrame(rows)
 
 # WT sense-strand FASTA
-with open(f"{OUT}/5S-rRNA_sense_CORRECTED.fa", "w") as f:
+with open(f"{OUT}/5S-rRNA_sense.fa", "w") as f:
     f.write(f">5S_rRNA sense strand (119 nt)\n{SENSE}\n")
 
 # per-variant MFE/ddG table (sense strand)
-d.to_csv(f"{OUT}/RNAfold_sense_per_variant_CORRECTED.csv", index=False)
+d.to_csv(f"{OUT}/RNAfold_sense_per_variant.csv", index=False)
 
 # position x base ddG matrix
 mat = d.pivot(index="Pos", columns="Alt", values="ddG")
-mat.to_csv(f"{OUT}/Folding_energies_sense_matrix_CORRECTED.csv")
+mat.to_csv(f"{OUT}/Folding_energies_sense_matrix.csv")
 
 print(f"\nwrote {len(d)} variants across {d.Pos.nunique()} positions")
 print(f"ddG range: {d.ddG.min():.1f} to {d.ddG.max():.1f}  (median {d.ddG.median():.2f})")

@@ -231,4 +231,4 @@ out = OUTDIR / "00_methylation_overview_hifi.pdf"
 fig.savefig(out, dpi=150, bbox_inches="tight")
 plt.close(fig)
 print(f"Saved: {out}")
-print(f"Panel D mode: {'ALU split' if alu_populated else 'legacy 3-region (re-run script 37 for ALU)'}")
+print(f"Panel D mode: {'ALU split' if alu_populated else '3-region (ALU not populated)'}")

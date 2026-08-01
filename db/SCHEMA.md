@@ -210,7 +210,7 @@ One row per numbered repeat copy within a haplotype. Copies are numbered 1-based
 | `n_snv_5s_gene` | INTEGER | Subset of `n_snv_gene` that fall in the 5S gene region (consensus positions 630–748). This is the primary measure of gene sequence divergence |
 | `n_snv_nts_pre` | INTEGER | Variants in the separate NTS-pre MAFFT alignment |
 | `n_snv_nts_post` | INTEGER | Variants in the separate NTS-post MAFFT alignment |
-| `category` | TEXT | `"identical"` if `n_snv_5s_gene = 0` (no 5S gene variants); `"highly_similar"` otherwise. For legacy HPRC databases this was originally BLAST-pident-based and was corrected to the gene-variant definition |
+| `category` | TEXT | `"identical"` if `n_snv_5s_gene = 0` (no 5S gene variants); `"highly_similar"` otherwise |
 | `border_note` | TEXT | Array position annotation (see §5.4) |
 
 UNIQUE constraint on `(haplotype_id, copy_number)`.

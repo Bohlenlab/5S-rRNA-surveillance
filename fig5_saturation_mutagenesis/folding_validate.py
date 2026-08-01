@@ -26,14 +26,14 @@ def rs_mfe(seq):
     return float(m.group(1)) if m else float("nan")
 
 wt = rs_mfe(SENSE); print(f"RNAstructure WT MFE = {wt:.2f}")
-d = pd.read_csv(f"{OUT}/RNAfold_sense_per_variant_CORRECTED.csv")
+d = pd.read_csv(f"{OUT}/RNAfold_sense_per_variant.csv")
 rs = []
 for k, (p, a) in enumerate(zip(d.Pos, d.Alt)):
     mut = SENSE[:p-1] + a + SENSE[p:]
     rs.append(round(rs_mfe(mut) - wt, 2))
     if k % 50 == 0: print(f"  {k}/{len(d)}", flush=True)
 d["ddG_RNAstructure"] = rs
-d.to_csv(f"{OUT}/RNAfold_sense_per_variant_CORRECTED.csv", index=False)
+d.to_csv(f"{OUT}/RNAfold_sense_per_variant.csv", index=False)
 sr = spearmanr(d.ddG, d.ddG_RNAstructure); pr = pearsonr(d.ddG, d.ddG_RNAstructure)
 print(f"\n[VALIDATION] RNAfold ΔΔG vs RNAstructure ΔΔG (independent algorithm):")
 print(f"   Spearman ρ={sr[0]:.3f} (p={sr[1]:.1e})   Pearson r={pr[0]:.3f}   n={len(d)}")

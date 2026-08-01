@@ -16,8 +16,8 @@ from scipy.stats import spearmanr
 plt.rcParams.update({"font.family":"Arial","pdf.fonttype":42,"ps.fonttype":42,"axes.linewidth":0.8,"font.size":7})
 CM=1/2.54
 OUT=os.environ.get("FIVES_OUT","output")
-d=pd.read_csv(f"{OUT}/RNAfold_sense_per_variant_CORRECTED.csv")
-m=pd.read_csv(f"{OUT}/folding_vs_function_CORRECTED.tsv",sep="\t")
+d=pd.read_csv(f"{OUT}/RNAfold_sense_per_variant.csv")
+m=pd.read_csv(f"{OUT}/folding_vs_function.tsv",sep="\t")
 ICR=[(50,60,"Box A"),(67,72,"IE"),(80,90,"Box C")]; ORANGE="#E8A33D"
 def inicr(p): return any(s<=p<=e for s,e,_ in ICR)
 
@@ -80,8 +80,8 @@ from matplotlib.lines import Line2D
 fig.legend(handles=[Line2D([],[],marker='o',ls='',color=ORANGE,label='internal promoter (Box A/IE/C)',ms=4),
                     Line2D([],[],marker='o',ls='',color='#9aa0a6',label='other position',ms=4)],
            frameon=False,fontsize=5.5,loc="lower center",ncol=2,bbox_to_anchor=(0.5,0.0))
-for fp in [f"{OUT}/Figure_folding_energy_CORRECTED.pdf",
+for fp in [f"{OUT}/Figure_folding_energy.pdf",
            os.path.join(OUT, "manuscript_tables", "Figure5", "Figure_folding_energy.pdf")]:
     fig.savefig(fp,bbox_inches="tight")
-print("wrote Figure_folding_energy_CORRECTED.pdf (+ manuscript_tables/Figure5 copy)")
+print("wrote Figure_folding_energy.pdf (+ manuscript_tables/Figure5 copy)")
 print(f"panel B ρ={spearmanr(m.dropna(subset=['ddG','incorp_60s_mean']).ddG,m.dropna(subset=['ddG','incorp_60s_mean']).incorp_60s_mean)[0]:+.2f}")
