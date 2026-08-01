@@ -1,0 +1,15 @@
+# Build / cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.DS_Store
+.ipynb_checkpoints/
+
+# Runtime working directories (created via the FIVES_OUT / FIVES_DATA env vars)
+/output/
+/data/
+
+# Local environment / secrets
+.env
+*.token
